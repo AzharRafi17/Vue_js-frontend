@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.char-count {
+    font-weight: 500;
+    margin-top: 1px;
+    padding-bottom: 1px;
+    position: absolute; /* Ensure it is positioned independently */
+    bottom: .5rem; /* Push it below the textarea */
+    left: 1rem; /* Align it with the textarea */
+    text-align: left;
+    width: auto;
+  }
+  
+  /* Submit Button Animation */
+  .submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    width: 3rem; /* Initial circular shape */
+    height: 3rem;
+    cursor: pointer;
+    border-radius: 9999px; /* Fully rounded */
+    position: relative;
+  }
+  
+  .submit-btn:hover {
+    width: 12rem; /* Expanded width on hover */
+    padding-left: 3rem; /* Spacing for the text */
+  }
+  
+  .arrow-icon {
+    transition: transform 0.3s ease, left 0.3s ease;
+  }
+  
+  .submit-btn:hover .arrow-icon {
+    transform: translateX(10px);
+    left: 1rem; /* Move arrow to the left on hover */
+  }
+  
+  .translate-text {
+    opacity: 0;
+    margin-left: 0;
+    transition: opacity 0.3s ease, margin-left 0.3s ease;
+  }
+  
+  .submit-btn:hover .translate-text {
+    opacity: 1;
+    margin-left: 1rem;
+  }
+  /* Smooth keyboard fade effect */
+  .keyboard-fade-enter-active,
+  .keyboard-fade-leave-active {
+    transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+  }
+  .keyboard-fade-enter,
+  .keyboard-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
