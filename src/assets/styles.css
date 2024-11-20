@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.font-face{
+/* .font-face{
     font-family:'open sans'
 }
 .custom-textarea {
@@ -10,39 +10,36 @@
   line-height: 2rem;
   overflow-wrap: break-word;
   resize: none;
-  overflow: hidden; /* Prevents scrollbar from appearing */
-}
+  overflow: hidden
 .arrow-icon {
-    font-weight: bold; /* Bold */
+    font-weight: bold; 
     transition: transform 0.3s ease, left 0.3s ease;
   }
 .char-count {
   font-weight: 500;
   margin-top: 1px;
   padding-bottom: 1px;
-  position: absolute; /* Ensure it is positioned independently */
-  bottom: .5rem; /* Push it below the textarea */
-  left: 1rem; /* Align it with the textarea */
-  text-align: left;
+  position: absolute; 
+  bottom: .5rem; 
+  left: 1rem; 
   width: auto;
 }
 
-/* Submit Button Animation */
 .submit-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.75rem;
-  width: 3rem; /* Initial circular shape */
+  width: 3rem; 
   height: 3rem;
   cursor: pointer;
-  border-radius: 9999px; /* Fully rounded */
+  border-radius: 9999px; 
   position: relative;
 }
 
 .submit-btn:hover {
-  width: 12rem; /* Expanded width on hover */
-  padding-left: 3rem; /* Spacing for the text */
+  width: 12rem; 
+  padding-left: 3rem; 
 }
 
 .arrow-icon {
@@ -51,7 +48,7 @@
 
 .submit-btn:hover .arrow-icon {
   transform: translateX(10px);
-  left: 1rem; /* Move arrow to the left on hover */
+  left: 1rem; 
 }
 
 .translate-text {
@@ -63,22 +60,19 @@
   opacity: 1;
   margin-left: 1rem;
 }
-
-/* Keyboard Slide Animation */
 .keyboard-slide-enter-active,
 .keyboard-slide-leave-active {
   transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
 .keyboard-slide-enter {
-  transform: translateY(50px); /* Starts below */
-  opacity: 0; /* Fully transparent */
+  transform: translateY(50px); 
+  opacity: 0;
 }
 
 .keyboard-slide-leave-to {
-  transform: translateY(50px); /* Ends below */
-  opacity: 0; /* Fully transparent */
+  opacity: 0;
 }
 .error-message {
   color: #e53e3e;
-}
+} */
