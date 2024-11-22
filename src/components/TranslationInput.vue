@@ -1,6 +1,7 @@
 <template>
     <div class="translationDemo flex justify-center bg-color gray items-center w-full h-screen">
       <!-- Main Translation Container -->
+       
       <div class="w-full h-1/4">
         <!-- Title -->
         <div class="flex flex-col justify-end items-center relative bottom-[120px]">
@@ -77,75 +78,135 @@
         </div>
       </div>
     </div>
+    <!-- Section 1 -->
+    <div
+      id="translateResultsInfo"
+      class="w-full h-screen flex justify-center items-center bg-[#ff6666]"
+    >
+      <div class="text-center w-2/5 flex flex-col items-center">
+        <p class="text-6xl mb-10  font-opensans text-white font-thin ">
+          There are 12 results in English and Spanish
+        </p>
+        <!-- Modified Button -->
+        <button class="nextButton" @click="scrollTotranslateMeaningInfo">
+        <i class="fas fa-angle-down"></i>
+        <span>View</span>
+        </button>
+      </div>
+    </div>  
+    <!-- Section 2 -->
+    <div id="translateMeaningInfo" class="w-full h-screen flex justify-center items-center bg-[#ff6666] relative">
+        <div class="text-center w-2/5 flex flex-col items-center">
+            <p class="text-6xl mb-10  font-opensans text-white font-thin ">
+                We have the meaning of your original text
+            </p>
+            <!-- Modified Button -->
+            <button class="nextButton">
+            <i class="fas fa-angle-down"></i>
+            <span>View</span>
+            </button>
+        </div>
+        <!-- Restart Button Positioned Right and Center -->
+        <div
+            id="restartContainer"
+            class="restart-container flex flex-col items-center justify-center w-16 h-16 bg-gray-300 text-gray-500  cursor-pointer transition-all duration-300 ease-in-out absolute right-10 top-1/2 "
+            @click="scrollToTop"
+            >
+            <i class="fas fa-sync-alt fa-lg mb-1"></i> <!-- Refresh Icon -->
+            <span class="text-sm">Restart</span> <!-- Text -->
+            </div>
+        </div>
+
   </template>
   
-  
-    
-    <script>
-    export default {
-        data() {
-        return {
-            inputText: "",
-            showKeyboard: false,
-            specialChars: [
-            "ä", "â", "á", "à", "ã", "å", "ë", "ê", "é", "è", "ï", "î", "í", "ì",
-            "ö", "ô", "ó", "ò", "õ", "ü", "û", "ú", "ù", "ç", "ñ", "ø", "ß", "æ",
-            "œ", "ÿ",
-            ],
-        };
-        },
-        methods: {
-        toggleKeyboard() {
-            this.showKeyboard = !this.showKeyboard;
-        },
-        handleFeedback() {
-            alert("Feedback button clicked!");
-        },
-        handleInput(event) {
-            this.filterInput();
-            this.autoResize(event);
-        },
-        filterInput() {
-            const allowedChars = /^[a-z0-9 ,.:\-äâáàãåëêéèïîíìöôóòõüûúùçñøßæœÿ']*$/;
-            this.inputText = this.inputText
-            .toLowerCase()
-            .split("")
-            .filter((char) => allowedChars.test(char))
-            .join("");
-        },
-        addSpecialCharacter(char) {
-            if (this.inputText.length >= 160) return;
-    
-            const textarea = this.$refs.textarea;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-    
-            this.inputText =
-            this.inputText.substring(0, start) +
-            char +
-            this.inputText.substring(end);
-    
-            this.$nextTick(() => {
-            textarea.setSelectionRange(start + 1, start + 1);
-            textarea.focus();
-            });
-        },
-        handleSubmit() {
-            if (this.inputText.trim() === "") {
-            alert("Please enter some text before submitting.");
+  <script>
+  export default {
+      data() {
+          return {
+              inputText: "",
+              showKeyboard: false,
+              specialChars: [
+                  "ä", "â", "á", "à", "ã", "å", "ë", "ê", "é", "è", "ï", "î", "í", "ì",
+                  "ö", "ô", "ó", "ò", "õ", "ü", "û", "ú", "ù", "ç", "ñ", "ø", "ß", "æ",
+                  "œ", "ÿ",
+              ],
+          };
+      },
+      methods: {
+          toggleKeyboard() {
+              this.showKeyboard = !this.showKeyboard;
+          },
+          handleFeedback() {
+              alert("Feedback button clicked!");
+          },
+          handleInput(event) {
+              this.filterInput();
+              this.autoResize(event);
+          },
+          filterInput() {
+              const allowedChars = /^[a-z0-9 ,.:\-äâáàãåëêéèïîíìöôóòõüûúùçñøßæœÿ']*$/;
+              this.inputText = this.inputText
+                  .toLowerCase()
+                  .split("")
+                  .filter((char) => allowedChars.test(char))
+                  .join("");
+          },
+          addSpecialCharacter(char) {
+              if (this.inputText.length >= 160) return;
+
+              const textarea = this.$refs.textarea;
+              const start = textarea.selectionStart;
+              const end = textarea.selectionEnd;
+
+              this.inputText =
+                  this.inputText.substring(0, start) +
+                  char +
+                  this.inputText.substring(end);
+
+              this.$nextTick(() => {
+                  textarea.setSelectionRange(start + 1, start + 1);
+                  textarea.focus();
+              });
+          },
+          handleSubmit() {
+              if (this.inputText.trim() === "") {
+                  // Disable scrolling
+                  document.body.style.overflow = "hidden";
+                  alert("Please enter some text before submitting.");
+              } else {
+                  // Enable scrolling and navigate to results section
+                  document.body.style.overflow = "auto";
+
+                  // Use correct ID here
+                  const resultsSection = document.getElementById("translateResultsInfo");
+                  if (resultsSection) {
+                      resultsSection.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                      console.error("Element with ID 'translateResultsInfo' not found!");
+                  }
+              }
+          },
+          scrollTotranslateMeaningInfo() {
+            const targetSection = document.getElementById("translateMeaningInfo"); 
+            if (targetSection) {
+            targetSection.scrollIntoView({ behavior: "smooth" });
             } else {
-            alert("Translation submitted!");
-            this.inputText = "";
-            }
-        },
-        autoResize(event) {
-            const textarea = event.target;
-            textarea.style.height = "auto"; // Reset height to calculate actual scroll height
-            textarea.style.height = textarea.scrollHeight + "px"; // Set height based on content
-        },
-        },
-    };
-    </script>
+            console.error("Target section not found!");
+    }
+
+          },
+          autoResize(event) {
+              const textarea = event.target;
+              textarea.style.height = "auto"; // Reset height to calculate actual scroll height
+              textarea.style.height = textarea.scrollHeight + "px"; // Set height based on content
+          },
+          scrollToTop() {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+          },
+      },
+  };
+</script>
+
     
     <style scoped>
     .translationDemo {
@@ -236,5 +297,107 @@
   opacity: 1;
   margin-left: 5rem;
 }
-    </style>
+#translateResultsInfo {
+  scroll-behavior: smooth;
+}
+.page {
+  scroll-snap-align: start;
+}
+
+#translateResultsInfo {
+  background-color: #ff6666;
+}
+.text-6xl{
+    font-weight: 300; 
+   
+}
+
+.nextButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  color: #000000;
+  border: none;
+  border-radius: 18px;
+  font-size: 1.25rem;
+  font-stretch: semi-expanded;
+  font-weight:400;
+  padding: 0.75rem 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  gap: 10px;
+}
+
+.nextButton:hover {
+  background-color: #ffffff;
+  color: grey;
+}
+
+.nextButton i {
+  font-size: 1rem;
+}
+/* smmsms */
+#translateMeaningInfo {
+  scroll-behavior: smooth;
+}
+.page {
+  scroll-snap-align: start;
+}
+
+#translateMeaningInfo {
+  background-color: #ff6666;
+}
+.text-6xl{
+    font-weight: 300; 
+   
+}
+
+.nextButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  color: #000000;
+  border: none;
+  border-radius: 18px;
+  font-size: 1.25rem;
+  font-stretch: semi-expanded;
+  font-weight:400;
+  padding: 0.75rem 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  gap: 10px;
+}
+
+.nextButton:hover {
+  background-color: #ffffff;
+  color: grey;
+}
+
+.nextButton i {
+  font-size: 1rem;
+}
+/* Styling for the Restart Container */
+.restart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background-color: #d0c8c8;
+      color: #333;
+      border-radius: 15%;
+      cursor: pointer;
+      transition: transform 0.3s ease-in-out;
+      right: 10px;
+      bottom: 20px;
+  }
+  
+  .restart-container:hover {
+      transform: scale(1);
+  }
+
+</style>
     
