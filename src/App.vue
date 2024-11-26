@@ -1,19 +1,72 @@
 <template>
-  <!-- <div id="app" class="app-container flex justify-center items-center h-screen bg-gray-100">
-    <div class="text-center mt-10"> -->
-      <!-- <h1 class="text-3xl font-semibold mb-6 text-gray-800">Let's translate the world's food</h1> -->
-      <!-- Translation Input Component -->
-      <TranslationInput />
-    <!-- </div>
-  </div> -->
+  <div class="translationDemoflex flex-col   bg-color gray items-center w-full h-screen">
+    <TranslateComponent @submit-text="handleTranslationSubmit" />
+    <ResultAndMeaningComponent
+      v-if="showResults"
+      @view-meaning="handleViewMeaning"
+      @restart="handleRestart"
+    />
+  </div>
 </template>
 
 <script>
-import TranslationInput from './components/TranslationInput.vue';
-
+import TranslateComponent from './components/TranslationInput.vue';
+import ResultAndMeaningComponent from './components/ResultAndMeaningComponent.vue';
 export default {
+  data() {
+    return {
+      showResults: false,
+      showMeaning: false,
+    };
+  },
+ methods: {
+  handleTranslationSubmit() {
+    this.showResults = true;
+    this.showMeaning = false;
+
+    
+    document.body.style.overflow = 'auto';
+
+   
+    this.$nextTick(() => {
+      this.scrollToSection('translateResultsInfo');
+    });
+  },
+  handleViewMeaning() {
+    this.showMeaning = true;
+
+   
+    this.$nextTick(() => {
+      this.scrollToSection('translateMeaningInfo');
+    });
+  },
+  handleRestart() {
+    this.showResults = false;
+    this.showMeaning = false;
+
+  
+    document.body.style.overflow = 'hidden';
+
+    
+    this.scrollToSection('top');
+  },
+  scrollToSection(id) {
+    const targetSection = document.getElementById(id);
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  },
+},
+
   components: {
-    TranslationInput,
+    TranslateComponent,
+    ResultAndMeaningComponent,
   },
 };
 </script>
+
+<style>
+.translationDemo {
+  background-color: #f7f6f6;
+}
+</style>
