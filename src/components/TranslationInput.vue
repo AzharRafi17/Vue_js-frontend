@@ -102,7 +102,7 @@
             </p>
             <!-- Modified Button -->
             <button class="nextButton">
-            <i class="fas fa-angle-down"></i>
+            <i class="fas fa-angle-down"></i> 
             <span>View</span>
             </button>
         </div>
@@ -112,7 +112,7 @@
             class="restart-container flex flex-col items-center justify-center w-16 h-16 bg-gray-300 text-gray-500  cursor-pointer transition-all duration-300 ease-in-out absolute right-10 top-1/2 "
             @click="scrollToTop"
             >
-            <i class="fas fa-sync-alt fa-lg mb-1"></i> <!-- Refresh Icon -->
+            <i class="	fas fa-redo-alt  fa-lg mb-1"></i> <!-- Refresh Icon -->
             <span class="text-sm">Restart</span> <!-- Text -->
             </div>
         </div>
@@ -397,6 +397,7 @@
   
   .restart-container:hover {
       transform: scale(1);
+      background-color: #ffffff;
   }
 
 </style>
