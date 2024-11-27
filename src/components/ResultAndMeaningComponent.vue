@@ -49,18 +49,15 @@
         }
       },
       
-      scrollToTopAndEmitRestart() {
-      
+      scrollToTopAndEmitRestart() { 
         window.scrollTo({ top: 0, behavior: 'smooth' });
-  
-      
         setTimeout(() => {
           this.$emit('restart');
         }, 600); 
       },
     },
   };
-  </script>
+   </script>
   
   <style scoped>
   .nextButton {
@@ -109,5 +106,5 @@
   .restart-container:hover {
     background-color: #ffffff;
   }
-  </style>
+</style>
   

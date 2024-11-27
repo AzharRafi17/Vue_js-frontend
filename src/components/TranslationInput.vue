@@ -37,13 +37,12 @@
               </div>
             </div>
           </div>
-  
-          <!-- Special Characters Keyboard with transition classes -->
-          <transition
-            name="keyboard"
-            mode="out-in"
-          >
-            <div v-if="showKeyboard" class="keyboard-container flex flex-wrap w-3/5 bg-white text-gray-400 justify-center gap-1 mt-2 p-2 rounded-xl overflow-y-auto max-h-[188px]">
+        
+         <div class="keyboard-and-button-container flex flex-col items-center mt-2 w-3/5">
+          <div
+             class="keyboard-container flex flex-wrap w-full bg-white text-gray-400 justify-center gap-1 rounded-xl overflow-hidden transition-all duration-300"
+             :class="{'max-h-0 p-0': !showKeyboard, 'max-h-[188px] p-2': showKeyboard}"
+            >
               <button
                 v-for="(char, index) in specialChars"
                 :key="index"
@@ -53,108 +52,115 @@
                 {{ char }}
               </button>
             </div>
-          </transition>
-          
-          <!-- Submit Button -->
-          <ButtonComponent @action="handleSubmit" :icon="'fas fa-arrow-right'" buttonText="translate" />
+    
+          <ButtonComponent
+            @action="handleSubmit"
+            :icon="'fas fa-arrow-right'"
+            buttonText="translate"
+            class="mt-12"
+          />
+          </div>
         </div>
       </div>
     </div>
   </template>
   
-    
-    <script>
+<script>
     import ButtonComponent from './ButtonComponent.vue';
-    
     export default {
-        data() {
-        return {
-            inputText: "",
-            showKeyboard: false,
-            specialChars: ["ä", "â", "á", "à", "ã", "å", "ë", "ê", "é", "è", "ï", "î", "í",
-             "ì", "ö", "ô", "ó", "ò", "õ", "ü", "û", "ú", "ù", "ç", "ñ", "ø", "ß", "æ", "œ", "ÿ"],
-        };
-        },
-        methods: {
-        toggleKeyboard() {
-            this.showKeyboard = !this.showKeyboard;
-        },
-        handleInput(event) {
-            this.filterInput();
-            this.autoResize(event);  
-        },
-        filterInput() {
-            const allowedChars = /^[a-z0-9 ,.:\-äâáàãåëêéèïîíìöôóòõüûúùçñøßæœÿ']*$/;
-            this.inputText = this.inputText.toLowerCase().split("").filter((char) => allowedChars.test(char)).join("");
-        },
-        addSpecialCharacter(char) {
-            if (this.inputText.length >= 160) return;
-            const textarea = this.$refs.textarea;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            this.inputText = this.inputText.substring(0, start) + char + this.inputText.substring(end);
-            this.$nextTick(() => {
-            textarea.setSelectionRange(start + 1, start + 1);
-            textarea.focus();
-            });
-        },
-        handleSubmit() {
-  if (this.inputText.trim() === "") {
-    alert("Please enter some text before submitting.");
-  } else {
-    document.body.style.overflow = 'auto';
-    
-    this.$emit("submit-text", this.inputText);
-    const resultsSection = document.getElementById("translateResultsInfo");
-    if (resultsSection) {
-      resultsSection.scrollIntoView({ behavior: "smooth" });  
-    }
+    data() {
+    return {
+      inputText: "",
+      showKeyboard: false,
+      specialChars: ["ä", "â", "á", "à", "ã", "å", "ë", "ê", "é", "è", "ï", "î", "í", "ì", "ö", "ô", "ó", "ò", "õ", "ü", "û", "ú", "ù", "ç", "ñ", "ø", "ß", "æ", "œ", "ÿ"],
+     };
+    },
+    methods: {
+    toggleKeyboard() {
+      this.showKeyboard = !this.showKeyboard;
+     },
+    handleInput(event) {
+      this.filterInput();
+      this.autoResize(event);
+     },
+    filterInput() {
+      const allowedChars = /^[a-z0-9 ,.:\-äâáàãåëêéèïîíìöôóòõüûúùçñøßæœÿ']*$/;
+      this.inputText = this.inputText.toLowerCase().split("").filter((char) => allowedChars.test(char)).join("");
+     },
+    addSpecialCharacter(char) {
+      if (this.inputText.length >= 160) return;
+      const textarea = this.$refs.textarea;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      this.inputText = this.inputText.substring(0, start) + char + this.inputText.substring(end);
+      this.$nextTick(() => {
+        textarea.setSelectionRange(start + 1, start + 1);
+        textarea.focus();
+       });
+     },
+    handleSubmit() {
+      if (this.inputText.trim() === "") {
+        alert("Please enter some text before submitting.");
+      } else {
+        document.body.style.overflow = 'auto';
+        this.$emit("submit-text", this.inputText);
+        const resultsSection = document.getElementById("translateResultsInfo");
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+     },
+    resetInput() {
+      this.inputText = ""; 
+     },
+    autoResize(event) {
+      const textarea = event.target;
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+     },
+    },
+    components: {
+    ButtonComponent,
+    },
+};
+</script>
+
+<style scoped>
+  .keyboard-slide-enter-active,
+  .keyboard-slide-leave-active {
+  transition: all 0.3s ease; 
   }
-},
 
-        autoResize(event) {
-            const textarea = event.target;
-            textarea.style.height = "auto"; 
-            textarea.style.height = textarea.scrollHeight + "px"; 
-        },
-        },
-        components: {
-            ButtonComponent,
-        },
-    };
-    </script>
- <style scoped>
+  .keyboard-slide-enter-from {
+  opacity: 0;
+  transform: translateY(-20px); 
+  }
 
- .v-enter-active, .v-leave-active {
-   transition: opacity 0.2s ease, transform 0.2s ease;
- }
- 
- .v-enter-from, .v-leave-to {
-   opacity: 0;
-   transform: translateY(-20px);
- }
- 
- .v-leave-active {
-   position: absolute; 
- }
- 
- 
- .icon-button {
-   background: none;
-   cursor: pointer;
-   font-size: 1rem;
-   width: 1.5rem;
-   height: 2.5rem;
-   transition: color 0.2s ease;
- }
- 
- .icon-button:hover {
-   color: #333;
- }
- 
- .keyboard-container {
-   background-color: #fff;
-   transition: opacity 0.2s ease, transform 0.2s ease;
- }
- </style>
+  .keyboard-slide-enter-to {
+  opacity: 1;
+  transform: translateY(0); 
+  }
+
+  .keyboard-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0); 
+  }
+
+  .keyboard-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-20px); 
+  }
+  .icon-button {
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 1.5rem;
+  height: 2.5rem;
+  transition: color 0.2s ease;
+  }
+
+  .icon-button:hover {
+  color: #333;
+  }
+</style>
  
