@@ -1,10 +1,16 @@
 <template>
-  <div class="translationDemoflex flex-col bg-color gray items-center w-full h-screen">
-    <TranslateComponent ref="inputRef" @submit-text="handleTranslationSubmit" />
+  <div id="top" class="translationDemoflex flex-col bg-color gray items-center w-full h-screen">
+    <TranslateComponent 
+      ref="inputRef" 
+      :initialText="inputText" 
+      @submit-text="handleTranslationSubmit" 
+    />
     <ResultAndMeaningComponent
       v-if="showResults"
+      :hasUnknownWords="hasUnknownWords"
       @view-meaning="handleViewMeaning"
       @restart="handleRestart"
+      @fix="handleFix"
     />
   </div>
 </template>
@@ -17,13 +23,15 @@ export default {
   data() {
     return {
       showResults: false,
-      showMeaning: false,
+      hasUnknownWords: false,
+      inputText: "", // Store the input text here
     };
   },
   methods: {
-    handleTranslationSubmit() {
+    handleTranslationSubmit({ inputText, hasUnknownWords }) {
+      this.inputText = inputText; // Preserve the input text
       this.showResults = true;
-      this.showMeaning = false;
+      this.hasUnknownWords = hasUnknownWords;
 
       document.body.style.overflow = 'auto';
 
@@ -32,20 +40,25 @@ export default {
       });
     },
     handleViewMeaning() {
-      this.showMeaning = true;
-
       this.$nextTick(() => {
         this.scrollToSection('translateMeaningInfo');
       });
     },
     handleRestart() {
+      // Clear the input text and reset the state
+      this.inputText = ""; // Clear input text
       this.showResults = false;
-      this.showMeaning = false;
+      this.hasUnknownWords = false;
 
-     
-      this.$refs.inputRef.resetInput();
+      document.body.style.overflow = 'hidden'; // Disable scrolling
 
-      document.body.style.overflow = 'hidden';
+      this.scrollToSection('top');
+    },
+    handleFix() {
+      // Retain the input text and reset the state
+      this.showResults = false;
+
+      document.body.style.overflow = 'hidden'; // Disable scrolling
 
       this.scrollToSection('top');
     },
@@ -62,7 +75,6 @@ export default {
   },
 };
 </script>
-
 
 <style>
 .translationDemo {
