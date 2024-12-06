@@ -43,34 +43,38 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    props: {
-      hasUnknownWords: Boolean, // Prop to indicate if there are unknown words
+<script>
+export default {
+  props: {
+    hasUnknownWords: Boolean, // Prop to indicate if there are unknown words
+  },
+  computed: {
+    resultMessage() {
+      return this.hasUnknownWords
+        ? "Please remove or replace unknown words with an alternative before translating."
+        : "There are 12 results in English and Spanish";
     },
-    computed: {
-      resultMessage() {
-        return this.hasUnknownWords
-          ? "Please remove or replace unknown words with an alternative before translating."
-          : "There are 12 results in English and Spanish";
-      },
+  },
+  methods: {
+    scrollToTranslateMeaningInfo() {
+      const meaningSection = document.getElementById("translateMeaningInfo");
+      if (meaningSection) {
+        meaningSection.scrollIntoView({ behavior: "smooth" });
+      }
     },
-    methods: {
-      scrollToTranslateMeaningInfo() {
-        const meaningSection = document.getElementById("translateMeaningInfo");
-        if (meaningSection) {
-          meaningSection.scrollIntoView({ behavior: "smooth" });
-        }
-      },
-      scrollToTopAndEmitRestart() {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setTimeout(() => {
-          this.$emit("restart");
-        }, 600);
-      },
+    scrollToTopAndEmitRestart() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => {
+        this.$emit("restart");
+      }, 600);
     },
-  };
-  </script>
+    scrollToTop() { // Add this missing function
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+  },
+};
+</script>
+
     
     <style scoped>
     .nextButton {
