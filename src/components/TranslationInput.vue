@@ -79,7 +79,7 @@
        specialChars: [
          "ä","â", "á", "à", "ã", "å", "ë", "ê", "é", "è",
          "ï", "î", "í", "ì", "ö", "ô", "ó", "ò", "õ", "ü",
-         "û", "ú", "ù", "ç", "ñ","æ", "œ", "ÿ"
+         "û", "ú", "ù", "ç", "ñ","ø","ß","æ", "œ", "ÿ"
        ],
        unknownWords: ["asd", "suck", "tuscany"],
          maxLength: 160
@@ -92,9 +92,8 @@
 
       handleInput() { 
         const editableDiv = this.$refs.editableDiv;
-
-
         let rawInput = editableDiv.textContent;
+
         if (rawInput.length > this.maxLength) {
           editableDiv.textContent = rawInput.substring(0, this.maxLength);  
           this.setCaretPosition(editableDiv, this.maxLength);  
@@ -104,6 +103,7 @@
           filteredText,
           caretPosition
         } = this.filterText(editableDiv.textContent.toLowerCase(), this.getCaretPosition(editableDiv));
+
         
         if (filteredText.length > this.maxLength) {
           editableDiv.innerText = filteredText.substring(0, this.maxLength);
@@ -116,7 +116,7 @@
       },
 
       filterText(input, caretPosition) {
-        const allowedCharacters = /[a-z0-9 ,.:-]/g;
+        const allowedCharacters = /[a-z0-9 ,.,]/g;
         let filteredText = '';
         for (let i = 0; i < input.length; i++) {
           const char = input[i];
@@ -190,44 +190,46 @@
         const text = editableDiv.textContent;
         const newText =
           text.substring(0, caretPosition) + char + text.substring(caretPosition);
-
-        
         editableDiv.textContent = newText;
 
         this.setCaretPosition(editableDiv, caretPosition + 1);
-
         this.updateInputText();
 
-        this.highlightUnknownWords(newText);
       },
 
 
-    highlightUnknownWords(newText) {
-      const editableDiv = this.$refs.editableDiv;
-      const caretPosition = this.getCaretPosition(editableDiv);
-          const words = newText.split(/(\w+|[^\w\s]|\s+)/g).filter((word) => word !== '');
-      const stack = []
-      for (let [index, word] of words.entries()) {
-          let isWhiteSpace = false
-          word = word.replace('\n', ' ')
+      highlightUnknownWords(newText) {
+        const editableDiv = this.$refs.editableDiv;
+        const caretPosition = this.getCaretPosition(editableDiv);
+        const words = newText.match(/\S+|\s+/g) || [];
+        const stack = [];
 
-          isWhiteSpace = !word.trim()
+        for (let [index, word] of words.entries()) {
+          let isWhiteSpace = false;
+          word = word.replace('\n', ' ');
+
+          isWhiteSpace = !word.trim();
 
           if (isWhiteSpace) {
-            stack.push(word)
+            stack.push(word);
             continue;
           }
-          const cleanedWord = word.trim()
-          const unknownWord = this.unknownWords.find((w) => w.toLowerCase() === cleanedWord)
-          if (!unknownWord) {
-            stack.push(word)
-            continue
+
+          const cleanedWord = word.trim().replace(/[\s]+/g, "");
+        
+
+          const unknownWord = this.unknownWords.find((w) => w.toLowerCase() === cleanedWord);
+              if (!unknownWord) {
+            stack.push(word);
+          } else {
+            const unknownWordWrapper = `<span class="word-wrapper relative inline-block text-red-500 hover:text-black group">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
+            stack.push(unknownWordWrapper);
           }
-          const unknownWordWrapper = `<span class="word-wrapper relative inline-block mr-1 text-red-500 hover:text-black group">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
-          stack.push(unknownWordWrapper)
         }
+
         editableDiv.innerHTML = stack.join("");
         this.setCaretPosition(editableDiv, caretPosition);
+
         const icons = this.$refs.editableDiv.querySelectorAll(".remove-word-icon");
         icons.forEach((icon) => {
           icon.addEventListener("click", (event) => {
@@ -235,6 +237,7 @@
           });
         });
       },
+
   moveCaretToEnd(element) {
     const range = document.createRange();
     const selection = window.getSelection();
