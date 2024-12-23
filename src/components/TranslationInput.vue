@@ -194,6 +194,7 @@
 
         this.setCaretPosition(editableDiv, caretPosition + 1);
         this.updateInputText();
+        this.highlightUnknownWords(newText);
 
       },
 
@@ -205,7 +206,7 @@
         const stack = [];
 
         for (let [index, word] of words.entries()) {
-          let isWhiteSpace = false;
+          let isWhiteSpace = word.trim() === "";
           word = word.replace('\n', ' ');
 
           isWhiteSpace = !word.trim();
@@ -216,10 +217,9 @@
           }
 
           const cleanedWord = word.trim().replace(/[\s]+/g, "");
-        
-
+         
           const unknownWord = this.unknownWords.find((w) => w.toLowerCase() === cleanedWord);
-              if (!unknownWord) {
+               if (!unknownWord) {
             stack.push(word);
           } else {
             const unknownWordWrapper = `<span class="word-wrapper relative inline-block text-red-500 hover:text-black group">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
