@@ -223,7 +223,7 @@
                if (!unknownWord) {
             stack.push(word);
           } else {
-            const unknownWordWrapper = `<span class="word-wrapper relative inline-block text-red-500 hover:text-black group">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
+            const unknownWordWrapper = `<span class="word-wrapper relative inline-block text-red-500 hover:text-black group">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-red-500 cursor-pointer hidden group-hover:block transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
             stack.push(unknownWordWrapper);
           }
         }
