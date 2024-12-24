@@ -94,6 +94,12 @@
         const editableDiv = this.$refs.editableDiv;
         let rawInput = editableDiv.textContent;
 
+        if (!rawInput.trim()) {
+          this.inputText = "";
+          editableDiv.textContent = "";
+          this.$refs.wordCountElement.textContent = "0/160";
+          return;
+        }
         if (rawInput.length > this.maxLength) {
           editableDiv.textContent = rawInput.substring(0, this.maxLength);  
           this.setCaretPosition(editableDiv, this.maxLength);  
@@ -116,21 +122,36 @@
       },
 
       filterText(input, caretPosition) {
-        const allowedCharacters = /[a-z0-9 ,.,]/g;
+        const allowedCharacters = /[a-z0-9 ,.,/,-,]/g;
         let filteredText = '';
-        for (let i = 0; i < input.length; i++) {
-          const char = input[i];
-          if (char.match(allowedCharacters) || this.specialChars.includes(char)) {
-            filteredText += char.toLowerCase();
-          } else {
-            if (i < caretPosition) {
-              caretPosition -= 1;
-            }
-          }
-        }
-        return {filteredText, caretPosition};
-      },
+        let newCaretPosition = caretPosition;
+        let shouldPreventInput = false; 
 
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+
+           
+            if (char.match(allowedCharacters) || this.specialChars.includes(char)) {
+                filteredText += char.toLowerCase();
+            } else {
+               
+                if (i < caretPosition) {
+                    newCaretPosition -= 1; 
+                }
+                shouldPreventInput = true; 
+            }
+        }
+        if (shouldPreventInput) {
+            this.$refs.editableDiv.textContent = filteredText;
+            this.setCaretPosition(this.$refs.editableDiv, newCaretPosition); 
+        } else {
+            
+            this.$refs.editableDiv.textContent = filteredText;
+            this.setCaretPosition(this.$refs.editableDiv, newCaretPosition);
+        }
+
+        return { filteredText, caretPosition: newCaretPosition };
+    },
        preventEnterKey(event) {
          if (event.key === "Enter") {
          event.preventDefault();
