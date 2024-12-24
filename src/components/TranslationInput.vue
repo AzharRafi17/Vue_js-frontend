@@ -155,6 +155,7 @@
          } else {
            for (let i = 0; i < node.childNodes.length; i++) {
              traverseNode(node.childNodes[i]);
+             if (found) return;
            }
          }
        };
@@ -249,12 +250,13 @@
   },
   getCaretPosition(element) {
     const selection = window.getSelection();
+    if (selection.rangeCount === 0) return 0;
     const range = selection.getRangeAt(0)
-    const clonedRange = range.cloneRange()
-    clonedRange.selectNodeContents(element)
-    clonedRange.setEnd(range.endContainer, range.endOffset)
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(element);
+    preCaretRange.setEnd(range.endContainer, range.endOffset);
 
-    return clonedRange.toString().length
+    return preCaretRange.toString().length;
   },
   updateInputText() {
     this.inputText = this.$refs.editableDiv.innerText;
