@@ -1,12 +1,20 @@
 <template>
-  <div class="translationDemo flex justify-center bg-gray-85 items-center w-full h-screen">
+  <div
+    class="translationDemo flex justify-center bg-gray-85 items-center w-full h-screen"
+  >
     <div class="w-full h-1/4">
-      <div class="flex flex-col justify-end items-center relative bottom-[120px]">
+      <div
+        class="flex flex-col justify-end items-center relative bottom-[120px]"
+      >
         <!-- Main Heading -->
-        <p class="text-[44px] max-w-[411px] leading-[50px] text-center mb-[30px]">
+        <p
+          class="text-[44px] max-w-[411px] leading-[50px] text-center mb-[30px]"
+        >
           Let's translate the world's food
         </p>
-        <div class="translateInputContainer h-[132px] w-[45%] bg-white shadow-md rounded-lg">
+        <div
+          class="translateInputContainer h-[132px] w-[45%] bg-white shadow-md rounded-lg"
+        >
           <div
             class="inputBox h-[75%] w-full px-4 pt-4 text-center text-[22px] font-light bg-transparent outline-none resize-none border border-gray-300 overflow-hidden whitespace-pre-wrap break-words"
             contenteditable="true"
@@ -18,7 +26,9 @@
           <div class="h-[25%] flex justify-between items-center px-4">
             <div class="text-sm text-[11px]">
               <span
-                :class="inputText.length === 160 ? 'text-red-500' : 'text-gray-400'"
+                :class="
+                  inputText.length === 160 ? 'text-red-500' : 'text-gray-400'
+                "
                 ref="wordCountElement"
               >
                 {{ inputText.length }}/160
@@ -40,7 +50,10 @@
         >
           <div
             class="keyboard-container flex flex-wrap w-full bg-white text-gray-400 justify-center gap-1 rounded-xl overflow-hidden transition-all duration-300"
-            :class="{ 'max-h-0 p-0': !showKeyboard, 'max-h-[188px] p-1': showKeyboard }"
+            :class="{
+              'max-h-0 p-0': !showKeyboard,
+              'max-h-[188px] p-1': showKeyboard,
+            }"
           >
             <button
               v-for="(char, index) in specialChars"
@@ -64,38 +77,62 @@
     <!-- Suggestion Tooltip -->
     <div
       v-if="hoveredWord && suggestions[hoveredWord.toLowerCase()]"
-      class="tooltip-class absolute bg-transparent border-transparent rounded-xl p-2 flex flex-col gap-2 z-50  font-roboto-slab"
+      class="tooltip-class absolute bg-transparent border-transparent rounded-xl p-2 flex flex-col gap-2 z-50 font-roboto-slab"
       :style="tooltipStyle"
     >
-  <div 
-      v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
-      :key="index"
-      class="px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
-      @click="replaceWord(suggestion)"
-    >
-      {{ suggestion }}
-  </div>
-</div>
-
+      <div
+        v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
+        :key="index"
+        class="tooltip-class px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
+        @click="replaceWord(suggestion)"
+      >
+        {{ suggestion }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import ButtonComponent from './ButtonComponent.vue';
+import ButtonComponent from "./ButtonComponent.vue";
 export default {
   data() {
     return {
       inputText: "",
       showKeyboard: false,
       specialChars: [
-        "ä", "â", "á", "à", "ã", "å", "ë", "ê", "é", "è",
-        "ï", "î", "í", "ì", "ö", "ô", "ó", "ò", "õ", "ü",
-        "û", "ú", "ù", "ç", "ñ", "æ", "œ", "ÿ"
+        "ä",
+        "â",
+        "á",
+        "à",
+        "ã",
+        "å",
+        "ë",
+        "ê",
+        "é",
+        "è",
+        "ï",
+        "î",
+        "í",
+        "ì",
+        "ö",
+        "ô",
+        "ó",
+        "ò",
+        "õ",
+        "ü",
+        "û",
+        "ú",
+        "ù",
+        "ç",
+        "ñ",
+        "æ",
+        "œ",
+        "ÿ",
       ],
-      unknownWords: ["asd","suck", "tuscany"],
+      unknownWords: ["asd", "suck", "tuscany"],
       suggestions: {
-        suck: ["durian", "dill", "dates","duck"],
-        tuscany: ["tagliatelie", "tortellini"]
+        suck: ["durian", "dill", "dates", "duck"],
+        tuscany: ["tagliatelie", "tortellini"],
       },
       tooltipHideTimer: null,
       isHoveringTooltip: false,
@@ -137,53 +174,86 @@ export default {
       this.updateInputText();
       this.highlightUnknownWords(filteredText);
     },
+    sanitizeInput() {
+      const editableDiv = this.$refs.editableDiv;
+      const allowedChars = /^[a-z0-9 ,.:\-äâáàãåëêéèïîíìöôóòõüûúùçñøßæœÿ]*$/;
+      this.inputText = this.inputText
+        .toLowerCase()
+        .split("")
+        .filter((char) => allowedChars.test(char))
+        .join("")
+        .substring(0, 160);
+      editableDiv.innerText = this.inputText;
+      this.$refs.editableDiv.innerText = this.inputText;
+      this.highlightUnknownWords();
+    },
     filterText(text, caretPosition) {
-    const filteredText = text.replace(/[0-9]/g, ""); // Example: removing numbers
-    const removedCharactersCount = text.length - filteredText.length;
-    const adjustedCaretPosition = caretPosition - removedCharactersCount;
+      const filteredText = text.replace(/[0-9]/g, ""); // Example: removing numbers
+      const removedCharactersCount = text.length - filteredText.length;
+      const adjustedCaretPosition = caretPosition - removedCharactersCount;
 
-    return { filteredText, caretPosition: Math.max(0, adjustedCaretPosition) };
-  },
-  highlightUnknownWords(newText) {
-  const editableDiv = this.$refs.editableDiv;
-  const caretPosition = this.getCaretPosition(editableDiv);
-  const words = newText.match(/\S+|\s+/g) || [];
-  const stack = [];
+      return {
+        filteredText,
+        caretPosition: Math.max(0, adjustedCaretPosition),
+      };
+    },
+    addSpecialCharacter(char) {
+      const editableDiv = this.$refs.editableDiv;
 
-  for (let [index, word] of words.entries()) {
-    let isWhiteSpace = word.trim() === "";
-    word = word.replace("\n", " ");
+      const caretPosition = this.getCaretPosition(editableDiv);
 
-    if (isWhiteSpace) {
-      stack.push(word);
-      continue;
-    }
+      const text = editableDiv.textContent;
+      const newText =
+        text.substring(0, caretPosition) + char + text.substring(caretPosition);
+      editableDiv.textContent = newText;
 
-    const cleanedWord = word.trim().replace(/[\s]+/g, "");
-    const unknownWord = this.unknownWords.find(
-      (w) => w.toLowerCase() === cleanedWord
-    );
+      this.setCaretPosition(editableDiv, caretPosition + 1);
+      this.updateInputText();
+      this.highlightUnknownWords(newText);
+    },
 
-    if (!unknownWord) {
-      stack.push(word);
-    } else if (cleanedWord === "asd") {
-      const asdWordWrapper = `<span class="word-wrapper relative inline-block text-red-500 hover:text-black group" data-word="${cleanedWord}">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-black cursor-pointer hidden group-hover:block transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
-      stack.push(asdWordWrapper);
-    } else {
-      const unknownWordWrapper = `<span class="word-wrapper relative inline-block text-red-500 hover:text-black group" data-word="${cleanedWord}">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-red-500 cursor-pointer hidden group-hover:block transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
-      stack.push(unknownWordWrapper);
-    }
-  }
+    highlightUnknownWords(newText) {
+      const editableDiv = this.$refs.editableDiv;
+      const caretPosition = this.getCaretPosition(editableDiv);
+      const words = newText.match(/\S+|\s+/g) || [];
+      const stack = [];
 
-  editableDiv.innerHTML = stack.join("");
-  this.setCaretPosition(editableDiv, caretPosition);
-  const icons = this.$refs.editableDiv.querySelectorAll(".remove-word-icon");
-  icons.forEach((icon) => {
-    icon.addEventListener("click", (event) => {
-      this.removeWord(event.target.closest(".word-wrapper"));
-    });
-  });
-  const wordsToHover = editableDiv.querySelectorAll(".word-wrapper");
+      for (let [index, word] of words.entries()) {
+        let isWhiteSpace = word.trim() === "";
+        word = word.replace("\n", " ");
+
+        if (isWhiteSpace) {
+          stack.push(word);
+          continue;
+        }
+
+        const cleanedWord = word.trim().replace(/[\s]+/g, "");
+        const unknownWord = this.unknownWords.find(
+          (w) => w.toLowerCase() === cleanedWord
+        );
+
+        if (!unknownWord) {
+          stack.push(word);
+        } else if (cleanedWord === "asd") {
+          const asdWordWrapper = `<span class="word-wrapper relative inline-block text-red-500 hover:text-black group" data-word="${cleanedWord}">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-black cursor-pointer hidden group-hover:block transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
+          stack.push(asdWordWrapper);
+        } else {
+          const unknownWordWrapper = `<span class="word-wrapper relative inline-block text-red-500 hover:text-black group" data-word="${cleanedWord}">${word}<span contenteditable="false" class="remove-word-icon absolute top-[10%] right-[-10px] transform translate-y-[-50%] text-xs text-red-500 cursor-pointer hidden group-hover:block transition-opacity duration-300" data-word-index="${index}"><img src="cross.png" alt="Close Icon" width="15px" /></span></span>`;
+          stack.push(unknownWordWrapper);
+        }
+      }
+
+      editableDiv.innerHTML = stack.join("");
+      this.setCaretPosition(editableDiv, caretPosition);
+      const icons =
+        this.$refs.editableDiv.querySelectorAll(".remove-word-icon");
+      icons.forEach((icon) => {
+        icon.addEventListener("click", (event) => {
+          this.removeWord(event.target.closest(".word-wrapper"));
+        });
+      });
+
+      const wordsToHover = editableDiv.querySelectorAll(".word-wrapper");
       wordsToHover.forEach((wordElement) => {
         wordElement.addEventListener("mouseenter", (event) => {
           const hoveredText = event.target.getAttribute("data-word");
@@ -193,35 +263,40 @@ export default {
               top: `${event.target.getBoundingClientRect().bottom}px`,
               left: `${event.target.getBoundingClientRect().left}px`,
             };
+            const tooltip = document.querySelector(".tooltip-class");
+            if (tooltip) {
+              tooltip.style.top = `${event.target.getBoundingClientRect().bottom}px`;
+              tooltip.style.left = `${event.target.getBoundingClientRect().left}px`;
+            }
             clearTimeout(this.tooltipHideTimer);
           } else {
             this.hoveredWord = null;
           }
         });
+
         wordElement.addEventListener("mouseleave", () => {
           if (!this.isHoveringTooltip) {
             this.tooltipHideTimer = setTimeout(() => {
               this.hoveredWord = null;
-            }, 500);
+            }, 300);
           }
         });
       });
-
-      const tooltip = document.querySelector('.tooltip-class');
+      const tooltip = document.querySelector(".tooltip-class");
+      console.log(tooltip)
       if (tooltip) {
         tooltip.addEventListener("mouseenter", () => {
           this.isHoveringTooltip = true;
-          clearTimeout(this.tooltipHideTimer); // Cancel hide if user hovers over tooltip
+          clearTimeout(this.tooltipHideTimer);
         });
         tooltip.addEventListener("mouseleave", () => {
           this.isHoveringTooltip = false;
           this.tooltipHideTimer = setTimeout(() => {
-            this.hoveredWord = null; // Hide when user leaves tooltip after a delay
-          }, 500);
+            this.hoveredWord = null;
+          }, 300);
         });
       }
     },
-
     replaceWord(suggestion) {
       if (!this.hoveredWord) return;
 
@@ -232,9 +307,9 @@ export default {
       editableDiv.innerHTML = this.inputText;
       this.highlightUnknownWords(this.inputText);
       setTimeout(() => {
-      this.hoveredWord = null; // Clear tooltip after replacement
+        this.hoveredWord = null;
       }, 100);
-    },  
+    },
 
     setCaretPosition(element, position) {
       const range = document.createRange();
@@ -310,29 +385,27 @@ export default {
 </script>
 
 <style scoped>
-  p {
-      font-family: "Roboto Slab";
-      font-weight: 300;
-  }
-  
-  
-  .inputBox {
-      font-family: Roboto Slab;
-      border: none;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-  }
-  .inputBox:focus-visible {
-      outline: none;
-  }
-  .word-wrapper:hover {
+p {
+  font-family: "Roboto Slab";
+  font-weight: 300;
+}
+
+.inputBox {
+  font-family: Roboto Slab;
+  border: none;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.inputBox:focus-visible {
+  outline: none;
+}
+.word-wrapper:hover {
   color: black !important;
 }
-  .icon-button {
-      padding: 4px;
-      background: none;
-      cursor: pointer;
-      font-size: 1rem;
-  }
-  
+.icon-button {
+  padding: 4px;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
 </style>
