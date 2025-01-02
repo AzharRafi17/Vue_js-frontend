@@ -67,8 +67,7 @@
       class="tooltip-class absolute bg-transparent border-transparent rounded-xl p-2 flex flex-col gap-2 z-50  font-roboto-slab"
       :style="tooltipStyle"
     >
-  <div
-      
+  <div 
       v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
       :key="index"
       class="px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
@@ -98,12 +97,11 @@ export default {
         suck: ["durian", "dill", "dates","duck"],
         tuscany: ["tagliatelie", "tortellini"]
       },
+      tooltipHideTimer: null,
+      isHoveringTooltip: false,
       hoveredWord: null,
-      tooltipStyle: {
-        top: '0px',
-        left: '0px',
-      },
-      maxLength: 160
+      tooltipStyle: {},
+      maxLength: 160,
     };
   },
   methods: {
@@ -179,48 +177,51 @@ export default {
 
   editableDiv.innerHTML = stack.join("");
   this.setCaretPosition(editableDiv, caretPosition);
-
   const icons = this.$refs.editableDiv.querySelectorAll(".remove-word-icon");
   icons.forEach((icon) => {
     icon.addEventListener("click", (event) => {
       this.removeWord(event.target.closest(".word-wrapper"));
     });
   });
-
   const wordsToHover = editableDiv.querySelectorAll(".word-wrapper");
-  wordsToHover.forEach((wordElement) => {
-    wordElement.addEventListener("mouseenter", (event) => {
-      const hoveredText = event.target.getAttribute("data-word");
-      if (this.suggestions[hoveredText]) {
-        this.hoveredWord = hoveredText;
-        this.tooltipStyle = {
-          top: `${event.target.getBoundingClientRect().bottom}px`,
-          left: `${event.target.getBoundingClientRect().left}px`,
-        };
-        clearTimeout(this.tooltipHideTimer);
-      } else {
-        this.hoveredWord = null;
-      }
-    });
-    wordElement.addEventListener("mouseleave", () => {
-      this.tooltipHideTimer = setTimeout(() => {
-        this.hoveredWord = null;
+      wordsToHover.forEach((wordElement) => {
+        wordElement.addEventListener("mouseenter", (event) => {
+          const hoveredText = event.target.getAttribute("data-word");
+          if (this.suggestions[hoveredText]) {
+            this.hoveredWord = hoveredText;
+            this.tooltipStyle = {
+              top: `${event.target.getBoundingClientRect().bottom}px`,
+              left: `${event.target.getBoundingClientRect().left}px`,
+            };
+            clearTimeout(this.tooltipHideTimer);
+          } else {
+            this.hoveredWord = null;
+          }
+        });
+        wordElement.addEventListener("mouseleave", () => {
+          if (!this.isHoveringTooltip) {
+            this.tooltipHideTimer = setTimeout(() => {
+              this.hoveredWord = null;
+            }, 500);
+          }
+        });
       });
-  });
-});
 
-const tooltip = document.querySelector('.tooltip-class');
-if (tooltip) {
-  tooltip.addEventListener("mouseenter", () => {
-    clearTimeout(this.tooltipHideTimer); // Cancel hide if user hovers over tooltip
-  });
-  tooltip.addEventListener("mouseleave", () => {
-    this.tooltipHideTimer = setTimeout(() => {
-      this.hoveredWord = null; // Hide when user leaves tooltip after a delay
-    }, 500);
-  });
-}
-  },
+      const tooltip = document.querySelector('.tooltip-class');
+      if (tooltip) {
+        tooltip.addEventListener("mouseenter", () => {
+          this.isHoveringTooltip = true;
+          clearTimeout(this.tooltipHideTimer); // Cancel hide if user hovers over tooltip
+        });
+        tooltip.addEventListener("mouseleave", () => {
+          this.isHoveringTooltip = false;
+          this.tooltipHideTimer = setTimeout(() => {
+            this.hoveredWord = null; // Hide when user leaves tooltip after a delay
+          }, 500);
+        });
+      }
+    },
+
     replaceWord(suggestion) {
       if (!this.hoveredWord) return;
 
