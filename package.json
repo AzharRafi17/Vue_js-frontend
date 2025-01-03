@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build:scss": "sass src/styles/main.scss dist/styles/main.css"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
@@ -24,7 +25,10 @@
     "eslint-plugin-vue": "^8.0.3",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
-    "tailwindcss": "^3.4.14"
+    "sass": "^1.83.0",
+    "sass-loader": "^16.0.4",
+    "tailwindcss": "^3.4.14",
+    "vue-loader": "^17.4.2"
   },
   "eslintConfig": {
     "root": true,

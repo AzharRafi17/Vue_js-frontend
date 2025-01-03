@@ -7,16 +7,14 @@
         class="flex flex-col justify-end items-center relative bottom-[120px]"
       >
         <!-- Main Heading -->
-        <p
-          class="text-[44px] max-w-[411px] leading-[50px] text-center mb-[30px]"
-        >
+        <p class="text-4xl max-w-[411px] leading-[50px] text-center mb-7">
           Let's translate the world's food
         </p>
         <div
           class="translateInputContainer h-[132px] w-[45%] bg-white shadow-md rounded-lg"
         >
           <div
-            class="inputBox h-[75%] w-full px-4 pt-4 text-center text-[22px] font-light bg-transparent outline-none resize-none border border-gray-300 overflow-hidden whitespace-pre-wrap break-words"
+            class="inputBox h-[75%] w-full px-4 pt-4 text-center text-xl font-light bg-transparent outline-none resize-none border border-gray-300 overflow-hidden whitespace-pre-wrap break-words"
             contenteditable="true"
             ref="editableDiv"
             @input="handleInput"
@@ -24,7 +22,7 @@
             :style="{ color: 'grey' }"
           ></div>
           <div class="h-[25%] flex justify-between items-center px-4">
-            <div class="text-sm text-[11px]">
+            <div class="text-xs">
               <span
                 :class="
                   inputText.length === 160 ? 'text-red-500' : 'text-gray-400'
@@ -83,7 +81,7 @@
       <div
         v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
         :key="index"
-        class="tooltip-class px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
+        class="px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
         @click="replaceWord(suggestion)"
       >
         {{ suggestion }}
@@ -283,7 +281,7 @@ export default {
         });
       });
       const tooltip = document.querySelector(".tooltip-class");
-      console.log(tooltip)
+      console.log(tooltip);
       if (tooltip) {
         tooltip.addEventListener("mouseenter", () => {
           this.isHoveringTooltip = true;

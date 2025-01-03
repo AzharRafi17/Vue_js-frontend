@@ -76,8 +76,39 @@ export default {
 };
 </script>
 
-<style>
-.translationDemo {
-  background-color: #f7f6f6;
+<style scoped lang="scss">
+$background-color: #f7f6f6;
+
+.translationDemoflex {
+  background-color: $background-color;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+
+  &.bg-color {
+    background-color: $background-color;
+  }
+
+  &.gray {
+    background-color: #f7f7f7;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .h-screen {
+    height: 100vh;
+  }
 }
 </style>
