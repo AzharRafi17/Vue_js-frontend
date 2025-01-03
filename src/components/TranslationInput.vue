@@ -77,6 +77,8 @@
       v-if="hoveredWord && suggestions[hoveredWord.toLowerCase()]"
       class="tooltip-class absolute bg-transparent border-transparent rounded-xl p-2 flex flex-col gap-2 z-50 font-roboto-slab"
       :style="tooltipStyle"
+      @mouseenter="tooltipMouseEnter"
+      @mouseleave="tooltipMouseLeave"
     >
       <div
         v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
@@ -250,60 +252,49 @@ export default {
           this.removeWord(event.target.closest(".word-wrapper"));
         });
       });
-
       const wordsToHover = editableDiv.querySelectorAll(".word-wrapper");
       wordsToHover.forEach((wordElement) => {
         wordElement.addEventListener("mouseenter", (event) => {
           const hoveredText = event.target.getAttribute("data-word");
+
           if (this.suggestions[hoveredText]) {
             this.hoveredWord = hoveredText;
             this.tooltipStyle = {
               top: `${event.target.getBoundingClientRect().bottom}px`,
               left: `${event.target.getBoundingClientRect().left}px`,
             };
-            const tooltip = document.querySelector(".tooltip-class");
-            if (tooltip) {
-              tooltip.style.top = `${event.target.getBoundingClientRect().bottom}px`;
-              tooltip.style.left = `${event.target.getBoundingClientRect().left}px`;
-            }
-            clearTimeout(this.tooltipHideTimer);
-          } else {
-            this.hoveredWord = null;
           }
         });
 
         wordElement.addEventListener("mouseleave", () => {
           if (!this.isHoveringTooltip) {
-            this.tooltipHideTimer = setTimeout(() => {
-              this.hoveredWord = null;
-            }, 300);
+            this.hoveredWord = null; // Hide tooltip when mouse leaves the word
           }
         });
       });
-      const tooltip = document.querySelector(".tooltip-class");
-      console.log(tooltip);
-      if (tooltip) {
-        tooltip.addEventListener("mouseenter", () => {
-          this.isHoveringTooltip = true;
-          clearTimeout(this.tooltipHideTimer);
-        });
-        tooltip.addEventListener("mouseleave", () => {
-          this.isHoveringTooltip = false;
-          this.tooltipHideTimer = setTimeout(() => {
-            this.hoveredWord = null;
-          }, 300);
-        });
+    },
+    tooltipMouseEnter() {
+      this.isHoveringTooltip = true;
+    },
+
+    tooltipMouseLeave() {
+      this.isHoveringTooltip = false;
+      if (!this.isHoveringTooltip) {
+        this.hoveredWord = null; // Hide tooltip after mouse leaves
       }
     },
     replaceWord(suggestion) {
       if (!this.hoveredWord) return;
-
       const editableDiv = this.$refs.editableDiv;
+      const caretPosition = this.getCaretPosition(editableDiv); // Preserve the caret position
       const regex = new RegExp(`\\b${this.hoveredWord}\\b`, "gi");
-      this.inputText = this.inputText.replace(regex, suggestion);
-
+      this.inputText = this.inputText.replace(regex, () => {
+        return `<span class="word-wrapper" data-word="${suggestion}">${suggestion}</span>`;
+      });
       editableDiv.innerHTML = this.inputText;
+      this.setCaretPosition(editableDiv, caretPosition);
       this.highlightUnknownWords(this.inputText);
+      this.updateInputText();
       setTimeout(() => {
         this.hoveredWord = null;
       }, 100);
@@ -355,16 +346,24 @@ export default {
     updateInputText() {
       this.inputText = this.$refs.editableDiv.innerText;
     },
+
     removeWord(wordElement) {
       const wordToRemove = wordElement.getAttribute("data-word");
       if (!wordToRemove) return;
 
+      const editableDiv = this.$refs.editableDiv;
+      const caretPosition = this.getCaretPosition(editableDiv);
+
       this.inputText = this.inputText.replace(wordToRemove, "").trim();
-      this.$refs.editableDiv.innerHTML = this.inputText;
+      editableDiv.innerHTML = this.inputText;
 
       this.highlightUnknownWords(this.inputText);
+      this.setCaretPosition(editableDiv, caretPosition);
+      this.updateInputText();
+
       this.hoveredWord = null; // Clear tooltip
     },
+
     handleSubmit() {
       if (this.inputText.trim() === "") {
         alert("Please enter some text before submitting.");
@@ -376,6 +375,7 @@ export default {
       this.$emit("submit-text", { inputText: this.inputText, hasUnknownWords });
     },
   },
+
   components: {
     ButtonComponent,
   },
