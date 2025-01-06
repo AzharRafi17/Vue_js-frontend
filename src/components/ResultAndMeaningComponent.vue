@@ -87,41 +87,34 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-$primary-color: #ff6666;
-$button-hover-color: #9d9c9c;
-$button-bg-color: #ffffff;
-$font-color: #1b1b1b;
-$restart-bg-color: #d0c8c8;
-$restart-hover-color: #ffffff;
-
+<style scoped>
 .nextButton {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $button-bg-color;
-  color: $font-color;
+  background-color: #ffffff;
+  color: #1b1b1b;
   font-size: 1.25rem;
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+}
 
-  i {
-    margin-right: 0.5rem;
-    font-size: 1.5rem;
-    transition: transform 0.3s ease-in-out;
-  }
+.nextButton i {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease-in-out;
+}
 
-  &:hover {
-    background-color: $button-bg-color;
-    color: $button-hover-color;
+.nextButton:hover {
+  background-color: #ffffff;
+  color: #9d9c9c;
+}
 
-    i {
-      transform: translateY(5px);
-    }
-  }
+.nextButton:hover i {
+  transform: translateY(5px);
 }
 
 .restart-container {
@@ -131,43 +124,43 @@ $restart-hover-color: #ffffff;
   justify-content: center;
   width: 60px;
   height: 60px;
-  background-color: $restart-bg-color;
+  background-color: #d0c8c8;
   color: #333;
   border-radius: 15%;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
-
-  &:hover {
-    background-color: $restart-hover-color;
-  }
 }
 
+.restart-container:hover {
+  background-color: #ffffff;
+}
+.nextButton,
 .fixButton {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $button-bg-color;
-  color: $font-color;
+  background-color: #ffffff;
+  color: #1b1b1b;
   font-size: 1.25rem;
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+}
 
-  i {
-    margin-right: 0.5rem;
-    font-size: 1.5rem;
-    transition: transform 0.3s ease-in-out;
-  }
+.fixButton i {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease-in-out;
+}
 
-  &:hover {
-    background-color: $button-bg-color;
-    color: $button-hover-color;
+.fixButton:hover {
+  background-color: #ffffff;
+  color: #9d9c9c;
+}
 
-    i {
-      transform: translateY(5px);
-    }
-  }
+.fixButton:hover i {
+  transform: translateY(5px);
 }
 </style>

@@ -56,38 +56,38 @@
             <button
               v-for="(char, index) in specialChars"
               :key="index"
-              class="p-2 w-8 h-8 flex justify-center items-center text-gray-400 cursor-pointer border border-gray-300 rounded hover:bg-gray-100"
+              class="p-4 w-10 h-8 flex justify-center items-center text-gray-400 cursor-pointer border border-gray-300 rounded hover:bg-gray-100"
               @click="addSpecialCharacter(char)"
             >
               {{ char }}
             </button>
           </div>
-          <ButtonComponent
-            @action="handleSubmit"
-            :icon="'fas fa-arrow-right'"
-            buttonText="translate"
-            class="mt-12"
-          />
         </div>
+        <ButtonComponent
+          @action="handleSubmit"
+          :icon="'fas fa-arrow-right'"
+          buttonText="translate"
+          class="mt-12"
+        />
       </div>
     </div>
+  </div>
 
-    <!-- Suggestion Tooltip -->
+  <!-- Suggestion Tooltip -->
+  <div
+    v-if="hoveredWord && suggestions[hoveredWord.toLowerCase()]"
+    class="tooltip-class absolute bg-transparent border-transparent rounded-xl p-2 flex flex-col gap-2 z-50 font-roboto-slab"
+    :style="tooltipStyle"
+    @mouseenter="tooltipMouseEnter"
+    @mouseleave="tooltipMouseLeave"
+  >
     <div
-      v-if="hoveredWord && suggestions[hoveredWord.toLowerCase()]"
-      class="tooltip-class absolute bg-transparent border-transparent rounded-xl p-2 flex flex-col gap-2 z-50 font-roboto-slab"
-      :style="tooltipStyle"
-      @mouseenter="tooltipMouseEnter"
-      @mouseleave="tooltipMouseLeave"
+      v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
+      :key="index"
+      class="px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
+      @click="replaceWord(suggestion)"
     >
-      <div
-        v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
-        :key="index"
-        class="px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
-        @click="replaceWord(suggestion)"
-      >
-        {{ suggestion }}
-      </div>
+      {{ suggestion }}
     </div>
   </div>
 </template>
@@ -127,6 +127,8 @@ export default {
         "ñ",
         "æ",
         "œ",
+        "ß",
+        "ø",
         "ÿ",
       ],
       unknownWords: ["asd", "suck", "tuscany"],
@@ -170,13 +172,15 @@ export default {
         editableDiv.innerText = filteredText.substring(0, this.maxLength);
         this.setCaretPosition(editableDiv, caretPosition);
       }
+      editableDiv.innerText = filteredText;
+      this.setCaretPosition(editableDiv, caretPosition);
 
       this.updateInputText();
-      this.highlightUnknownWords(filteredText);
+      this.highlightUnknownWords(filteredText, caretPosition);
     },
     sanitizeInput() {
       const editableDiv = this.$refs.editableDiv;
-      const allowedChars = /^[a-z0-9 ,.:\-äâáàãåëêéèïîíìöôóòõüûúùçñøßæœÿ]*$/;
+      const allowedChars = /^[a-z 0-9 ,.:\-äâáàãåëêéèïîíìöôóòõüûúùçñøßæœÿ]*$/;
       this.inputText = this.inputText
         .toLowerCase()
         .split("")
@@ -188,15 +192,22 @@ export default {
       this.highlightUnknownWords();
     },
     filterText(text, caretPosition) {
-      const filteredText = text.replace(/[0-9]/g, ""); // Example: removing numbers
-      const removedCharactersCount = text.length - filteredText.length;
-      const adjustedCaretPosition = caretPosition - removedCharactersCount;
-
-      return {
-        filteredText,
-        caretPosition: Math.max(0, adjustedCaretPosition),
-      };
+      const allowedCharacters = /[a-z0-9 ,.:-]/g;
+      let filteredText = "";
+      let newCaretPosition = caretPosition;
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char.match(allowedCharacters) || this.specialChars.includes(char)) {
+          filteredText += char.toLowerCase();
+        } else {
+          if (i < caretPosition) {
+            newCaretPosition = Math.max(0, newCaretPosition - 1);
+          }
+        }
+      }
+      return { filteredText, caretPosition: newCaretPosition };
     },
+
     addSpecialCharacter(char) {
       const editableDiv = this.$refs.editableDiv;
 
@@ -268,7 +279,7 @@ export default {
 
         wordElement.addEventListener("mouseleave", () => {
           if (!this.isHoveringTooltip) {
-            this.hoveredWord = null; // Hide tooltip when mouse leaves the word
+            this.hoveredWord = null;
           }
         });
       });
@@ -280,21 +291,29 @@ export default {
     tooltipMouseLeave() {
       this.isHoveringTooltip = false;
       if (!this.isHoveringTooltip) {
-        this.hoveredWord = null; // Hide tooltip after mouse leaves
+        this.hoveredWord = null;
       }
     },
     replaceWord(suggestion) {
       if (!this.hoveredWord) return;
+
       const editableDiv = this.$refs.editableDiv;
-      const caretPosition = this.getCaretPosition(editableDiv); // Preserve the caret position
+
+      const rawText = editableDiv.textContent;
       const regex = new RegExp(`\\b${this.hoveredWord}\\b`, "gi");
-      this.inputText = this.inputText.replace(regex, () => {
-        return `<span class="word-wrapper" data-word="${suggestion}">${suggestion}</span>`;
-      });
-      editableDiv.innerHTML = this.inputText;
-      this.setCaretPosition(editableDiv, caretPosition);
-      this.highlightUnknownWords(this.inputText);
+
+      const updatedText = rawText.replace(regex, suggestion);
+      editableDiv.textContent = updatedText;
+
+      const replacedWordStartPosition = rawText.indexOf(this.hoveredWord);
+      const newCaretPosition = replacedWordStartPosition + suggestion.length;
+
+      this.setCaretPosition(editableDiv, newCaretPosition);
+
+      this.highlightUnknownWords(updatedText);
+
       this.updateInputText();
+
       setTimeout(() => {
         this.hoveredWord = null;
       }, 100);
@@ -354,14 +373,23 @@ export default {
       const editableDiv = this.$refs.editableDiv;
       const caretPosition = this.getCaretPosition(editableDiv);
 
-      this.inputText = this.inputText.replace(wordToRemove, "").trim();
-      editableDiv.innerHTML = this.inputText;
+      const rawText = editableDiv.textContent;
+      const beforeRemoveLength = rawText.length;
+      const updatedText = rawText
+        .replace(new RegExp(`\\b${wordToRemove}\\b`, "gi"), "")
+        .trim();
 
-      this.highlightUnknownWords(this.inputText);
-      this.setCaretPosition(editableDiv, caretPosition);
+      editableDiv.textContent = updatedText;
+
+      const afterRemoveLength = updatedText.length;
+      const adjustedCaretPosition =
+        caretPosition - (beforeRemoveLength - afterRemoveLength);
+
+      this.highlightUnknownWords(updatedText);
+      this.setCaretPosition(editableDiv, Math.max(0, adjustedCaretPosition));
       this.updateInputText();
 
-      this.hoveredWord = null; // Clear tooltip
+      this.hoveredWord = null;
     },
 
     handleSubmit() {
