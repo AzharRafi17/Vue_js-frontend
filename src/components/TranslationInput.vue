@@ -1,103 +1,13 @@
-<template>
-  <div
-    class="translationDemo flex justify-center bg-gray-85 items-center w-full h-screen"
-  >
-    <div class="w-full h-1/4">
-      <div
-        class="flex flex-col justify-end items-center relative bottom-[120px]"
-      >
-        <!-- Main Heading -->
-        <p class="text-4xl max-w-[411px] leading-[50px] text-center mb-7">
-          Let's translate the world's food
-        </p>
-        <div
-          class="translateInputContainer h-[132px] w-[45%] bg-white shadow-md rounded-lg"
-        >
-          <div
-            class="inputBox h-[75%] w-full px-4 pt-4 text-center text-xl font-light bg-transparent outline-none resize-none border border-gray-300 overflow-hidden whitespace-pre-wrap break-words"
-            contenteditable="true"
-            ref="editableDiv"
-            @input="handleInput"
-            @keydown="preventEnterKey"
-            :style="{ color: 'grey' }"
-          ></div>
-          <div class="h-[25%] flex justify-between items-center px-4">
-            <div class="text-xs">
-              <span
-                :class="
-                  inputText.length === 160 ? 'text-red-500' : 'text-gray-400'
-                "
-                ref="wordCountElement"
-              >
-                {{ inputText.length }}/160
-              </span>
-            </div>
-            <div class="flex justify-center items-center space-x-2">
-              <button class="icon-button" @click="handleFeedback">
-                <i class="fas fa-comment-alt"></i>
-              </button>
-              <button class="icon-button" @click="toggleKeyboard">
-                <i class="fas fa-keyboard"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="keyboard-and-button-container flex flex-col items-center mt-2 w-[45%]"
-        >
-          <div
-            class="keyboard-container flex flex-wrap w-full bg-white text-gray-400 justify-center gap-1 rounded-xl overflow-hidden transition-all duration-300"
-            :class="{
-              'max-h-0 p-0': !showKeyboard,
-              'max-h-[188px] p-1': showKeyboard,
-            }"
-          >
-            <button
-              v-for="(char, index) in specialChars"
-              :key="index"
-              class="p-4 w-10 h-8 flex justify-center items-center text-gray-400 cursor-pointer border border-gray-300 rounded hover:bg-gray-100"
-              @click="addSpecialCharacter(char)"
-            >
-              {{ char }}
-            </button>
-          </div>
-        </div>
-        <ButtonComponent
-          @action="handleSubmit"
-          :icon="'fas fa-arrow-right'"
-          buttonText="translate"
-          class="mt-12"
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- Suggestion Tooltip -->
-  <div
-    v-if="hoveredWord && suggestions[hoveredWord.toLowerCase()]"
-    class="tooltip-class absolute bg-transparent border-transparent rounded-xl p-2 flex flex-col gap-2 z-50 font-roboto-slab"
-    :style="tooltipStyle"
-    @mouseenter="tooltipMouseEnter"
-    @mouseleave="tooltipMouseLeave"
-  >
-    <div
-      v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
-      :key="index"
-      class="px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
-      @click="replaceWord(suggestion)"
-    >
-      {{ suggestion }}
-    </div>
-  </div>
-</template>
-
 <script>
 import ButtonComponent from "./ButtonComponent.vue";
+import { franc } from "franc";
+import { languages } from "@/assets/language";
+
 export default {
   data() {
     return {
       inputText: "",
+      detectedLanguage: "",
       showKeyboard: false,
       specialChars: [
         "ä",
@@ -143,9 +53,22 @@ export default {
       maxLength: 160,
     };
   },
+  watch: {
+    inputText(newText) {
+      this.detectLanguage(newText);
+    },
+  },
   methods: {
     toggleKeyboard() {
       this.showKeyboard = !this.showKeyboard;
+    },
+    detectLanguage(text) {
+      const langCode = franc(text);
+      if (languages[langCode]) {
+        this.detectedLanguage = languages[langCode];
+      } else {
+        this.detectedLanguage = "Unknown Language";
+      }
     },
 
     handleInput() {
@@ -409,6 +332,110 @@ export default {
   },
 };
 </script>
+<template>
+  <div
+    class="translationDemo flex justify-center bg-gray-85 items-center w-full h-screen"
+  >
+    <div class="w-full h-1/4">
+      <div
+        class="flex flex-col justify-end items-center relative bottom-[120px]"
+      >
+        <!-- Main Heading -->
+        <p class="text-5xl max-w-[411px] leading-[50px] text-center mb-7">
+          Let's translate the world's food
+        </p>
+        <div
+          class="translateInputContainer h-[132px] w-[45%] bg-white shadow-md rounded-lg"
+        >
+          <div
+            class="inputBox h-[75%] w-full px-4 pt-4 text-center text-xl font-light bg-transparent outline-none resize-none border border-gray-300 overflow-hidden whitespace-pre-wrap break-words"
+            contenteditable="true"
+            ref="editableDiv"
+            @input="handleInput"
+            @keydown="preventEnterKey"
+            :style="{ color: 'grey' }"
+            
+          ></div>
+          <div class="h-[25%] flex justify-between items-center px-4">
+            <div class="text-xs">
+              <span
+                :class="
+                  inputText.length === 160 ? 'text-red-500' : 'text-gray-400'
+                "
+                ref="wordCountElement"
+              >
+                {{ inputText.length }}/160
+              </span>
+            </div>
+            <div class="flex justify-center items-center space-x-2">
+              <span
+                v-if="detectedLanguage"
+                class="text-sm text-gray-700 border border-gray-300 px-2 py-1 rounded-lg"
+              >
+                {{ detectedLanguage }}
+              </span>
+
+              <div class="flex justify-center items-center space-x-2">
+                <button class="icon-button" @click="handleFeedback">
+                  <i class="fas fa-comment-alt"></i>
+                </button>
+                <button class="icon-button" @click="toggleKeyboard">
+                  <i class="fas fa-keyboard"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="keyboard-and-button-container flex flex-col items-center mt-2 w-[45%]"
+        >
+          <div
+            class="keyboard-container flex flex-wrap w-full bg-white text-gray-400 justify-center gap-1 rounded-xl overflow-hidden transition-all duration-300"
+            :class="{
+              'max-h-0 p-0': !showKeyboard,
+              'max-h-[188px] p-1': showKeyboard,
+            }"
+          >
+            <button
+              v-for="(char, index) in specialChars"
+              :key="index"
+              class="p-4 w-10 h-8 flex justify-center items-center text-gray-400 cursor-pointer border border-gray-300 rounded hover:bg-gray-100"
+              @click="addSpecialCharacter(char)"
+            >
+              {{ char }}
+            </button>
+          </div>
+        </div>
+        <ButtonComponent
+          @action="handleSubmit"
+          :icon="'fas fa-arrow-right'"
+          buttonText="translate"
+          class="mt-12"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggestion Tooltip -->
+  <div
+    v-if="hoveredWord && suggestions[hoveredWord.toLowerCase()]"
+    class="tooltip-class absolute bg-transparent border-transparent rounded-xl p-2 flex flex-col gap-2 z-50 font-roboto-slab"
+    :style="tooltipStyle"
+    @mouseenter="tooltipMouseEnter"
+    @mouseleave="tooltipMouseLeave"
+  >
+    <div
+      v-for="(suggestion, index) in suggestions[hoveredWord.toLowerCase()]"
+      :key="index"
+      class="px-3 py-1 text-sm text-white bg-black hover:text-gray-500 rounded-2xl cursor-pointer transition-all duration-300"
+      @click="replaceWord(suggestion)"
+    >
+      {{ suggestion }}
+    </div>
+  </div>
+</template>
+
+
 
 <style scoped>
 p {
